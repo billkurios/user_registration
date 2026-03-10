@@ -6,5 +6,8 @@ from infrastructure.repositories.in_memory_user_repository import (
 
 
 class Container(containers.DeclarativeContainer):
+
+    wiring_config = containers.WiringConfiguration(packages=["application.routers"])
+
     user_repository = providers.Singleton(InMemoryUserRepository)
     user_service = providers.Singleton(UserService, user_repo=user_repository)
