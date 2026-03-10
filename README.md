@@ -25,17 +25,31 @@ A FastAPI-based user registration service.
 
 ### Using Docker (Recommended)
 
-1. Build the Docker image:
+There are two images: the FastAPI application and a PostgreSQL database. They are defined in `docker-compose.yml`.
+
+1. Start both services with Docker Compose:
    ```bash
-   docker build -t fastapi-app .
+   docker-compose up --build
    ```
 
-2. Run the container:
-   ```bash
-   docker run -p 8000:8000 fastapi-app
+   This will build the `web` image from the `Dockerfile` and pull the official Postgres image.
+
+2. The web service depends on the `db` service and will use the following connection string by default:
+   ```text
+   postgresql://postgres:password@db:5432/userdb
    ```
 
-3. Access the API at `http://localhost:8000`
+3. Access the API at `http://localhost:8000` once the containers are running.
+
+You can also still build the web image alone if desired:
+
+```bash
+# build only the application image
+docker build -t fastapi-app .
+
+# run the app without the database
+docker run -p 8000:8000 fastapi-app
+```
 
 ### Local Development
 
