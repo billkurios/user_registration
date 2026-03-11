@@ -23,6 +23,7 @@ services:
       POSTGRES_PORT: ${DB_PORT}
     volumes:
       - db_data:/var/lib/postgresql/data
+      - ./infrastructure/sql_scripts/create_user_table.sql:/docker-entrypoint-initdb.d/create_user_table.sql:ro
 
 volumes:
   db_data:

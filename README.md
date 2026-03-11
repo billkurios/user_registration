@@ -27,19 +27,32 @@ A FastAPI-based user registration service.
 
 There are two images: the FastAPI application and a PostgreSQL database. They are defined in `docker-compose.yml`.
 
-1. Start both services with Docker Compose:
+1. Create a `.env` file in the project root with the following default values for development:
+   ```env
+   DB_PORT=5432
+   DB_USER=postgres
+   DB_PASSWORD=password
+   DB_NAME=userdb
+   ```
+
+2. Start both services with Docker Compose:
    ```bash
    docker-compose up --build
    ```
 
    This will build the `web` image from the `Dockerfile` and pull the official Postgres image.
 
-2. The web service depends on the `db` service and will use the following connection string by default:
-   ```text
-   postgresql://postgres:password@db:5432/userdb
+3. Initialize the database (run this the first time you start the project):
+   ```bash
+   docker-compose exec db psql -U <database_username> -f ./docker-entrypoint-initdb.d/create_user_table.sql
    ```
 
-3. Access the API at `http://localhost:8000` once the containers are running.
+4. The web service depends on the `db` service and will use the following connection string by default:
+   ```text
+   postgresql://<database_username>:<database_password>@<database_docker_service_name>:<database_port>/<database_name>
+   ```
+
+5. Access the API at `http://localhost:8000` once the containers are running.
 
 You can also still build the web image alone if desired:
 
