@@ -5,7 +5,7 @@ class User(BaseModel):
     id: Optional[int] = None
     email: EmailStr
     name: str
-    password: str  # In real app, hash this
+    is_active: bool = False
 
-    class Config:
-        from_attributes = True
+class UserCreate(User):
+    password: str

@@ -44,7 +44,12 @@ There are two images: the FastAPI application and a PostgreSQL database. They ar
 
 3. Initialize the database (run this the first time you start the project):
    ```bash
-   docker-compose exec db psql -U <database_username> -f ./docker-entrypoint-initdb.d/create_user_table.sql
+   docker-compose exec db psql -U <db_username> -d <db_name> -f ./docker-entrypoint-initdb.d/create_user_table.sql
+   ```
+
+   For eg.
+   ```bash
+   docker-compose exec db psql -U postgres -d userdb -f ./docker-entrypoint-initdb.d/create_user_table.sql
    ```
 
 4. The web service depends on the `db` service and will use the following connection string by default:

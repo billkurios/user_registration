@@ -1,9 +1,13 @@
+import logging
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from domain.services.user_service import UserService
 from domain.schemas.user import User
 from application.config.container import Container
 from dependency_injector.wiring import inject, Provide
+
+
+logger = logging.getLogger(__name__)
 
 user_router = APIRouter(
     prefix="/user",
@@ -19,8 +23,8 @@ user_router = APIRouter(
 )
 
 
-class UserCreateRequest(BaseModel):
-    email: str
+class UserRegisterPayload(BaseModel):
+    email: EmailStr
     name: str
     password: str
 
@@ -30,12 +34,15 @@ class UserCreateRequest(BaseModel):
 @user_router.post("/register", response_model=User, response_model_exclude_none=False)
 @inject
 async def register_user(
-    request: UserCreateRequest, user_service: UserService = Depends(Provide[Container.user_service])
+    payload: UserRegisterPayload, user_service: UserService = Depends(Provide[Container.user_service])
 ) -> User:
     try:
+        logger.debug("POST /user/register called", extra={"email": payload.email, "name": payload.name})
         user = await user_service.register_user(
-            request.email, request.name, request.password
+            payload.email, payload.name, payload.password
         )
+        logger.info("POST /user/register succeeded", extra={"email": user.email, "user_id": user.id})
         return user
     except ValueError as e:
+        logger.warning(f"POST /user/register failed validation {payload}", extra={"email": payload.email, "error": str(e)})
         raise HTTPException(status_code=400, detail=str(e))
