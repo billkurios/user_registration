@@ -14,7 +14,7 @@ services:
       - .env
     environment:
       # DATABASE_URL is constructed from vars in .env file
-      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:$/${DB_NAME}
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:${DB_PORT}/${DB_NAME}
 
   # Database service: PostgreSQL database
   # Runs the official PostgreSQL 15 image with persistent storage
