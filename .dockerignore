@@ -1,0 +1,51 @@
+# Docker-related files
+docker-compose.yml
+docker-compose.yaml
+Dockerfile
+.dockerignore
+
+# Documentation
+README.md
+README.rst
+README.txt
+
+# Python package files
+setup.py
+setup.cfg
+
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# IDE and editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Python cache and dependencies
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+*.egg-info/
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+
+# Test and coverage
+.pytest_cache
+.coverage
+htmlcov/
+
+# OS files
+Thumbs.db

@@ -1,16 +1,24 @@
 version: '3.9'
 
 services:
+  # Web service: FastAPI application server
+  # Builds the Docker image from the Dockerfile and runs the Uvicorn server
+  # Exposes the application on port 8000 and depends on the PostgreSQL database
   web:
     build: .
     ports:
       - "8000:8000"
     depends_on:
       - db
+    env_file:
+      - .env
     environment:
       # DATABASE_URL is constructed from vars in .env file
       - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:$/${DB_NAME}
 
+  # Database service: PostgreSQL database
+  # Runs the official PostgreSQL 15 image with persistent storage
+  # Configuration loaded from .env file and uses docker-entrypoint-initdb.d for schema initialization
   db:
     image: postgres:15
     restart: always
