@@ -1,4 +1,7 @@
 import logging
+import random
+import string
+from datetime import datetime, timedelta
 from domain.schemas.user import User, UserCreate
 from domain.repositories.user_repository import UserRepository
 from infrastructure.database_pool import DatabasePool
@@ -13,15 +16,25 @@ class DatabaseUserRepository(UserRepository):
         self.db_pool = db_pool
 
     async def create_user(self, user: UserCreate) -> User:
-        """Create a new user in the database."""
+        """Create a new user and a 4-digit activation code in a single transaction."""
         logger.debug("create_user query start", extra={"email": user.email, "name": user.name})
-        query = """
+        insert_user_query = """
             INSERT INTO users (email, "user", password)
             VALUES ($1, $2, $3)
             RETURNING id
         """
-        user_id = await self.db_pool.fetchval(query, user.email, user.name, user.password)
-        logger.info("create_user query success", extra={"email": user.email, "user_id": user_id})
+        insert_code_query = """
+            INSERT INTO user_codes (user_id, code, expires_at)
+            VALUES ($1, $2, $3)
+        """
+        code = "".join(random.choices(string.digits, k=4))
+        expires_at = datetime.utcnow() + timedelta(minutes=1)
+
+        async with self.db_pool.transaction() as conn:
+            user_id = await conn.fetchval(insert_user_query, user.email, user.name, user.password)
+            await conn.execute(insert_code_query, user_id, code, expires_at)
+
+        logger.info("create_user succeeded with activation code", extra={"email": user.email, "user_id": user_id})
         return User(email=user.email, name=user.name, id=user_id)
 
     async def get_user_by_email(self, email: str) -> Optional[User]:

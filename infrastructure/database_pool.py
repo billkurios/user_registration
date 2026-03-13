@@ -1,5 +1,6 @@
 import asyncpg
 import os
+from contextlib import asynccontextmanager
 from typing import Optional
 
 
@@ -35,6 +36,18 @@ class DatabasePool:
         """Release a connection back to the pool."""
         if self.pool:
             await self.pool.release(connection)
+
+    @asynccontextmanager
+    async def transaction(self):
+        """Provide a connection with an open transaction. Commits on success, rolls back on error."""
+        if not self.pool:
+            await self.create_pool()
+        conn = await self.pool.acquire()
+        try:
+            async with conn.transaction():
+                yield conn
+        finally:
+            await self.pool.release(conn)
 
     async def execute(self, query: str, *args):
         """Execute a query."""
